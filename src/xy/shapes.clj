@@ -19,6 +19,9 @@
   ([x y z]
    (Coordinate. x y z)))
 
+(defn list->coords [coords]
+  (map (fn [[x y]] (coordinate x y)) coords))
+
 (defn point
   ([x y]
    (point (coordinate x y)))
@@ -29,27 +32,38 @@
 
 (defn multi-point
   [points]
-  (.createMultiPoint geometry-factory (into-array Point points)))
+  (.createMultiPoint geometry-factory
+                     (into-array Point
+                                 (map #(apply point %) points))))
 
 (defn linear-ring
   [coordinates]
-  (.createLinearRing geometry-factory (into-array Coordinate coordinates)))
+  (.createLinearRing geometry-factory
+                     (into-array Coordinate
+                                 (map #(apply coordinate %) coordinates))))
 
 (defn linestring
   [coordinates]
-  (.createLineString geometry-factory (into-array Coordinate coordinates)))
+  (.createLineString geometry-factory
+                     (into-array Coordinate
+                                 (map #(apply coordinate %) coordinates))))
 
 (defn multi-linestring
-  [linestrings]
-  (.createMultiLineString geometry-factory (into-array LineString linestrings)))
+  [coordinates]
+  (.createMultiLineString geometry-factory
+                          (into-array LineString
+                                      (map linestring coordinates))))
 
 (defn polygon
   ([outer-ring]
    (polygon outer-ring nil))
   ([outer-ring holes]
-   (.createPolygon geometry-factory outer-ring (into-array LinearRing holes))))
+   (.createPolygon geometry-factory
+                   (linear-ring outer-ring)
+                   (into-array LinearRing (map linear-ring holes)))))
 
 (defn multi-polygon
   [polygons]
-  (.createMultiPolygon geometry-factory (into-array Polygon polygons)))
+  (.createMultiPolygon geometry-factory
+                       (into-array Polygon (map polygon polygons))))
 

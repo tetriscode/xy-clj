@@ -2,6 +2,7 @@
   (:require [clojure.spec :as spec]
             [clojure.data.json :as json]
             [clojure.test.check.generators :as gen]
+            [clojure.walk :as walk]
             [xy.shapes :as shapes]))
 
 (defn circle-gen [x y]
@@ -102,6 +103,10 @@
 (spec/def ::featurecollectionpolygon-spec (spec/keys :req-un
                                                [:fcgj/type :gjpoly/features]))
 
+
+(defn list->coords [coords]
+  (map (fn [[x y]] (shapes/coordinate x y)) coords))
+
 (defmulti parse "Takes a geojson parsed string->map" :type)
 
 (defmethod parse "FeatureCollection"
@@ -110,7 +115,7 @@
 
 (defmethod parse "Feature"
   [val]
-  (parse val))
+  (parse (:geometry val)))
 
 (defmethod parse "GeometryCollection"
   [val]
@@ -130,7 +135,7 @@
 
 (defmethod parse "Linestring"
   [val]
-  (shapes/linestring (:coordinates val)))
+  (shapes/linestring (list->coords (:coordinates val))))
 
 (defmethod parse "MultiLinestring"
   [val]
@@ -138,14 +143,14 @@
 
 (defmethod parse "Polygon"
   [val]
-  (shapes/polygon (:coordinates val)))
+  (shapes/polygon (list->coords (first (:coordinates val)))))
 
 (defmethod parse "MultiPolygon"
   [val]
   (shapes/multi-polygon (:coordinates val)))
 
 (defn parse-str [val-str]
-  (parse (clojure.data.json/read-str val-str)))
+  (parse (walk/keywordize-keys (clojure.data.json/read-str val-str))))
 
 (defn stringify [val]
   (clojure.data.json/write-str val))
