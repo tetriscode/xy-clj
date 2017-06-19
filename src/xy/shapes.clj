@@ -24,11 +24,11 @@
 
 (defn point
   ([x y]
-   (point (coordinate x y)))
+   (point [x y]))
   ([x y z]
-   (point (coordinate x y z)))
-  ([^Coordinate coordinate]
-   (.createPoint geometry-factory coordinate)))
+   (point [x y z]))
+  ([coordinates]
+   (.createPoint geometry-factory (apply coordinate coordinates))))
 
 (defn multi-point
   [points]
