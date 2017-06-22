@@ -1,10 +1,12 @@
 # xy
 
-A Clojure library designed to ... well, that part is up to you.
+An idiomatic Clojure library that wraps JTS. No `.hasNext` on collections.
 
 ## Usage
 
-FIXME
+```
+=> (xy.geojson/parse-str (slurp "resources/sample.geojson"))
+```
 
 ## License
 
