@@ -7,7 +7,7 @@
 
 (defn circle-gen [x y]
   (let [vertices (+ (rand-int 8) 4)
-        radius (rand 3) ;2 dec degrees radius length
+        radius (rand 3)                                     ;2 dec degrees radius length
         rads (/ (* 2.0 Math/PI) vertices)
         pts (map (fn [r]
                    [(+ x (* radius (Math/cos (* r rads))))
@@ -16,8 +16,8 @@
     (conj pts (last pts))))
 
 (defn line-gen [x y cnt]
-  (let [vertices  (+ cnt 2)]
-    (map (fn  []
+  (let [vertices (+ cnt 2)]
+    (map (fn []
            [(+ x (rand))
             (+ y (rand))])
          (range vertices))))
@@ -28,7 +28,7 @@
 (spec/def :gj/coordinates (spec/with-gen
                             coll?
                             #(gen/fmap (fn [[lon lat]] (list lon lat))
-                                    (gen/tuple (spec/gen :gj/x) (spec/gen :gj/y)))))
+                                       (gen/tuple (spec/gen :gj/x) (spec/gen :gj/y)))))
 (spec/def :gjpt/type (spec/with-gen string? #(spec/gen #{"Point"})))
 (spec/def :gjlspec/coordinates
   (spec/with-gen
@@ -41,7 +41,7 @@
 (spec/def :gjpl/coordinates (spec/with-gen
                               coll?
                               #(gen/fmap (fn [[lon lat]] (list (circle-gen lon lat)))
-                                      (gen/tuple (spec/gen :gj/x) (spec/gen :gj/y)))))
+                                         (gen/tuple (spec/gen :gj/x) (spec/gen :gj/y)))))
 (spec/def :gjpl/type (spec/with-gen string? #(spec/gen #{"Polygon"})))
 (spec/def :gjmpt/coordinates (spec/coll-of :gj/coordinates))
 (spec/def :gjmpt/type (spec/with-gen string? #(spec/gen #{"MultiPoint"})))
@@ -63,11 +63,11 @@
                      (spec/and string? #(contains? geom-types %))
                      #(spec/gen geom-types)))
 (spec/def :gj/geometrytypes (spec/or :point :gj/point
-                               :linestring :gj/linestring
-                               :polygon :gj/polygon
-                               :multipoint :gj/multipoint
-                               :multilinestring :gj/multilinestring
-                               :multipolygon :gj/multipolygon))
+                                     :linestring :gj/linestring
+                                     :polygon :gj/polygon
+                                     :multipoint :gj/multipoint
+                                     :multilinestring :gj/multilinestring
+                                     :multipolygon :gj/multipolygon))
 (spec/def :gjpt/geometry :gj/point)
 (spec/def :gjpl/geometry :gj/polygon)
 (spec/def :gjlspec/geometry :gj/linestring)
@@ -79,21 +79,21 @@
 (spec/def :gfeature/type #{"Feature"})
 ; Single geojson point feature
 (spec/def ::pointfeature-spec (spec/keys :req-un
-                                   [:gfeature/id :gfeature/type
-                                    :gfeature/properties :gjpt/geometry]))
+                                         [:gfeature/id :gfeature/type
+                                          :gfeature/properties :gjpt/geometry]))
 ; Single geojson polygon feature
 (spec/def ::polygonfeature-spec (spec/keys :req-un
-                                     [:gfeature/id :gfeature/type
-                                      :gfeature/properties :gjpl/geometry]))
+                                           [:gfeature/id :gfeature/type
+                                            :gfeature/properties :gjpl/geometry]))
 ; Single geojson linestring feature
 (spec/def ::linestringfeature-spec (spec/keys :req-un
-                                        [:gfeature/id :gfeature/type
-                                         :gfeature/properties :gjlspec/geometry]))
+                                              [:gfeature/id :gfeature/type
+                                               :gfeature/properties :gjlspec/geometry]))
 
 ; Single geojson feature
 (spec/def ::feature-spec (spec/keys :req-un
-                              [:gfeature/id :gfeature/type
-                               :gj/geometry :gfeature/properties]))
+                                    [:gfeature/id :gfeature/type
+                                     :gj/geometry :gfeature/properties]))
 (spec/def :gj/features (spec/coll-of ::feature-spec))
 (spec/def :gjpoly/features (spec/coll-of ::polygonfeature-spec :min-count 1))
 (spec/def :fcgj/type (spec/with-gen
@@ -101,7 +101,7 @@
                        #(spec/gen #{"FeatureCollection"})))
 (spec/def ::featurecollection-spec (spec/keys :req-un [:fcgj/type :gj/features]))
 (spec/def ::featurecollectionpolygon-spec (spec/keys :req-un
-                                               [:fcgj/type :gjpoly/features]))
+                                                     [:fcgj/type :gjpoly/features]))
 
 
 (defn list->coords [coords]
@@ -111,11 +111,11 @@
 
 (defmethod parse "FeatureCollection"
   [val]
-  (map parse (:features val)))
+  (assoc val :features (map parse (:features val))))
 
 (defmethod parse "Feature"
   [val]
-  (parse (:geometry val)))
+  (assoc val :geometry (parse (:geometry val))))
 
 (defmethod parse "GeometryCollection"
   [val]
@@ -135,7 +135,7 @@
 
 (defmethod parse "Linestring"
   [val]
-  (shapes/linestring (list->coords (:coordinates val))))
+  (shapes/linestring (:coordinates val)))
 
 (defmethod parse "MultiLinestring"
   [val]
@@ -143,11 +143,13 @@
 
 (defmethod parse "Polygon"
   [val]
-  (shapes/polygon (list->coords (first (:coordinates val)))))
+  (shapes/polygon (first (:coordinates val))))
 
 (defmethod parse "MultiPolygon"
   [val]
   (shapes/multi-polygon (:coordinates val)))
+
+(defmethod parse :default [_] {})
 
 (defn parse-str [val-str]
   (parse (walk/keywordize-keys (clojure.data.json/read-str val-str))))
