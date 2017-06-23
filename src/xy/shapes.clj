@@ -55,8 +55,8 @@
                                       (map linestring coordinates))))
 
 (defn polygon
-  ([outer-ring]
-   (polygon outer-ring nil))
+  ([coordinates]
+   (polygon (first coordinates) (second coordinates)))
   ([outer-ring holes]
    (.createPolygon geometry-factory
                    (linear-ring outer-ring)

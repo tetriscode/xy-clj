@@ -51,7 +51,7 @@
 (spec/def :gjmpl/type (spec/with-gen string? #(spec/gen #{"MultiPolygon"})))
 
 (def geom-types #{"Point" "Polygon" "LineString"
-                  "MultiPolygon" "MultiLinestring" "MultiPoint"})
+                  "MultiPolygon" "MultiLineString" "MultiPoint"})
 (spec/def :gj/point (spec/keys :req-un [:gjpt/type :gj/coordinates]))
 (spec/def :gj/linestring (spec/keys :req-un [:gjlspec/type :gjlspec/coordinates]))
 (spec/def :gj/polygon (spec/keys :req-un [:gjpl/type :gjpl/coordinates]))
@@ -109,41 +109,98 @@
 
 (defmulti parse "Takes a geojson parsed string->map" :type)
 
+(defmulti write "Takes a map and produces a geojson string" #(.getGeometryType %))
+
 (defmethod parse "FeatureCollection"
   [val]
   (assoc val :features (map parse (:features val))))
+
+(defmethod write "FeatureCollection"
+  [val]
+  (json/write-str (assoc val :features (map write (:features val)))))
 
 (defmethod parse "Feature"
   [val]
   (assoc val :geometry (parse (:geometry val))))
 
+(defmethod write "Feature"
+  [val]
+  (json/write-str (assoc val :feature (write (:feature val)))))
+
 (defmethod parse "GeometryCollection"
   [val]
   (map parse (:geometries val)))
 
-(defmethod parse "Geometry"
+(defmethod write "GeometryCollection"
   [val]
-  (parse (:geometry val)))
+  (json/write-str (assoc val :geometries (map write (:geometries val)))))
 
 (defmethod parse "Point"
   [val]
   (shapes/point (:coordinates val)))
 
+(defmethod write "Point"
+  [val]
+  (json/write-str {:type "Point" :coordinates [(.getX val) (.getY val)]}))
+
 (defmethod parse "MultiPoint"
   [val]
   (shapes/multi-point (:coordinates val)))
 
-(defmethod parse "Linestring"
+(defmethod write "MultiPoint"
+  [val]
+  (json/write-str {:type "MultiPoint"
+                   :coordinates (map (fn [idx]
+                                       (let [geom (.getGeometryN val idx)]
+                                         [(.getX geom) (.getY geom)]))
+                                     (range (.getNumGeometries val)))}))
+
+(defmethod parse "LineString"
   [val]
   (shapes/linestring (:coordinates val)))
 
-(defmethod parse "MultiLinestring"
+(defmethod write "LineString"
+  [val]
+  (json/write-str {:type "LineString"
+                   :coordinates (map (fn [idx]
+                                       (let [pt (.getPointN val idx)]
+                                         [(.getX pt) (.getY pt)]))
+                                     (range (.getNumPoints val)))}))
+
+(defmethod parse "MultiLineString"
   [val]
   (shapes/multi-linestring (:coordinates val)))
 
+(defmethod write "MultiLineString"
+  [val]
+  (json/write-str {:type "MultiLineString"
+                   :coordinates (map (fn [idx]
+                                       (let [geom (.getGeometryN val idx)]
+                                         (map (fn [lidx]
+                                                (let [pt (.getPointN geom lidx)]
+                                                  [(.getX pt) (.getY pt)]))
+                                           (range (.getNumPoints geom)))))
+                                     (range (.getNumGeometries val)))}))
+
 (defmethod parse "Polygon"
   [val]
-  (shapes/polygon (first (:coordinates val))))
+  (shapes/polygon (first (:coordinates val)) (second (:coordinates val))))
+
+(defmethod write "Polygon"
+  [val]
+  (json/write-str {:type "Polygon"
+                   :coordinates [(let [shell (.getExteriorRing val)]
+                                   (map (fn [idx]
+                                          (let [pt (.getPointN shell idx)]
+                                            [(.getX pt) (.getY pt)]))
+                                        (range (.getNumPoints shell))))
+                                 (map (fn [hole-idx]
+                                        (let [hole (.getInteriorRingN val hole-idx)]
+                                          (map (fn [idx]
+                                                 (let [pt (.getPointN hole idx)]
+                                                   [(.getX pt) (.getY pt)]))
+                                               (range (.getNumPoints hole)))))
+                                      (range (.getNumInteriorRing val)))]}))
 
 (defmethod parse "MultiPolygon"
   [val]
