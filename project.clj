@@ -1,4 +1,4 @@
-(defproject xy "0.1.0-SNAPSHOT"
+(defproject xy "0.1.0"
   :description "XY: Idiomatic Clojure library for Geo"
   :url "http://github.com/tetriscode/xy"
   :license {:name "Eclipse Public License"
