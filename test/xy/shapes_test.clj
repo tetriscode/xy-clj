@@ -32,3 +32,8 @@
           holes [[[1.5 2.5] [2.5 3.5] [4.5 5.5] [1.5 2.5]]]]
       (is (= (str (shapes/polygon outer-ring holes)))))))
 
+(deftest within-test
+  (testing "WITHIN"
+    (let [pt (shapes/point 1 2)
+          poly (shapes/polygon [[[0 0] [3 0] [3 3] [3 0] [0 0]]])]
+      (is (shapes/within pt poly)))))
