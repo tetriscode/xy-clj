@@ -67,8 +67,5 @@
   (.createMultiPolygon geometry-factory
                        (into-array Polygon (map polygon polygons))))
 
-(defn within
-  "Tests if A is within B"
-  [a b]
-  (.within a b))
+
 

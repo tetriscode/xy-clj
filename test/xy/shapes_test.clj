@@ -1,6 +1,7 @@
 (ns xy.shapes-test
   (:require [clojure.test :refer :all]
-            [xy.shapes :as shapes]))
+            [xy.shapes :as shapes]
+            [xy.relations :as relations]))
 
 (deftest point-test
   (testing "POINT"
@@ -44,9 +45,8 @@
       (is (= (str (shapes/multi-polygon [[outer-ring holes] [outer-ring-two holes-two]]))
              mp-str)))))
 
-
 (deftest within-test
   (testing "WITHIN"
     (let [pt (shapes/point 1 2)
           poly (shapes/polygon [[[0 0] [3 0] [3 3] [3 0] [0 0]]])]
-      (is (shapes/within pt poly)))))
+      (is (relations/within? pt poly)))))
