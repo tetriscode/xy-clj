@@ -2,6 +2,8 @@
 
 An idiomatic Clojure library that wraps JTS. No `.hasNext` on collections.
 
+[![Build Status](https://travis-ci.org/tetriscode/xy.svg?branch=master)](https://travis-ci.org/tetriscode/xy)
+
 ## Usage
 
 ```
