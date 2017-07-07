@@ -10,6 +10,12 @@ An idiomatic Clojure library that wraps JTS. No `.hasNext` on collections.
 => (xy.geojson/parse (slurp "resources/sample.geojson"))
 ```
 
+## Test
+
+```
+lein test
+```
+
 ## License
 
 Copyright © 2017 @tetriscode
