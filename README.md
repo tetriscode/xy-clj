@@ -1,6 +1,6 @@
 # xy
 
-An idiomatic Clojure library that wraps JTS. No `.hasNext` on collections.
+An idiomatic Clojure library that wraps JTS.
 
 [![Build Status](https://travis-ci.org/tetriscode/xy.svg?branch=master)](https://travis-ci.org/tetriscode/xy)
 
