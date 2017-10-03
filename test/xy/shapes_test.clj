@@ -15,7 +15,7 @@
 (deftest linear-ring-test
   (testing "LINEARRING"
     (is (= (str (shapes/linear-ring [[1 2] [2 3] [3 4] [1 2]]))
-          "LINEARRING (1 2, 2 3, 3 4, 1 2)"))))
+           "LINEARRING (1 2, 2 3, 3 4, 1 2)"))))
 
 (deftest linestring-test
   (testing "LINESTRING"
@@ -24,7 +24,7 @@
 
 (deftest multi-linestring-test
   (testing "MULTILINESTRING"
-      (is (= (str (shapes/multi-linestring [[[1 2] [3 4]] [[4 5] [6 7]]]))
+    (is (= (str (shapes/multi-linestring [[[1 2] [3 4]] [[4 5] [6 7]]]))
            "MULTILINESTRING ((1 2, 3 4), (4 5, 6 7))"))))
 
 (deftest polygon-test

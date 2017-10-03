@@ -67,5 +67,3 @@
   (.createMultiPolygon geometry-factory
                        (into-array Polygon (map polygon polygons))))
 
-
-

@@ -103,7 +103,6 @@
 (spec/def ::featurecollectionpolygon-spec (spec/keys :req-un
                                                      [:fcgj/type :gjpoly/features]))
 
-
 (defn list->coords [coords]
   (map (fn [[x y]] (shapes/coordinate x y)) coords))
 
@@ -179,7 +178,7 @@
                                          (map (fn [lidx]
                                                 (let [pt (.getPointN geom lidx)]
                                                   [(.getX pt) (.getY pt)]))
-                                           (range (.getNumPoints geom)))))
+                                              (range (.getNumPoints geom)))))
                                      (range (.getNumGeometries val)))}))
 
 (defmethod parse "Polygon"
