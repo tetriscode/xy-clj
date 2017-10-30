@@ -50,3 +50,10 @@
     (let [pt (shapes/point 1 2)
           poly (shapes/polygon [[[0 0] [3 0] [3 3] [3 0] [0 0]]])]
       (is (relations/within? pt poly)))))
+
+(deftest disjoint-test
+  (testing "DISJOINT"
+    (let [pt (shapes/point 1 9)
+          poly (shapes/polygon [[[0 0] [3 0] [3 3] [3 0] [0 0]]])]
+      (is (relations/disjoint? pt poly)))))
+

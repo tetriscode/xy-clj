@@ -1,5 +1,5 @@
 (ns xy.geojson
-  (:require [clojure.spec :as spec]
+  (:require [clojure.spec.alpha :as spec]
             [clojure.data.json :as json]
             [clojure.test.check.generators :as gen]
             [clojure.walk :as walk]
@@ -207,7 +207,9 @@
 
 (defmethod parse :default [_] {})
 
-(defn parse-str [val-str]
+(defn parse-str
+  "Parses a string containing geojson"
+  [val-str]
   (parse (walk/keywordize-keys (clojure.data.json/read-str val-str))))
 
 (defn stringify [val]

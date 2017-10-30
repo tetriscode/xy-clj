@@ -1,9 +1,10 @@
-(defproject xy "0.4.1"
+(defproject tetriscode/xy "0.5.1"
   :description "XY: Idiomatic Clojure library for Geo"
   :url "http://github.com/tetriscode/xy"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta3"]
+                 [org.clojure/spec.alpha "0.1.134"]
                  [org.clojure/data.json "0.2.6"]
                  [org.locationtech.jts/jts-core "1.15.0-uhopper"
                   :exclusions [xerces/xercesImpl]]]
@@ -12,5 +13,6 @@
             [lein-cljfmt "0.5.7"]
             [jonase/eastwood "0.2.4"]
             [lein-kibit "0.1.5"]]
-  :repositories [["jts-snapshots" "https://dl.bintray.com/u-hopper/maven/"]]
+  :repositories [["jts-snapshots" "https://dl.bintray.com/u-hopper/maven/"]
+                 ["clojars" {:sign-releases false}]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]]}})
