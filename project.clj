@@ -1,5 +1,5 @@
-(defproject tetriscode/xy "0.5.1"
-  :description "XY: Idiomatic Clojure library for Geo"
+(defproject tetriscode/xy "0.5.2"
+  :description "XY: A Clojure library for Geo"
   :url "http://github.com/tetriscode/xy"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -15,4 +15,5 @@
             [lein-kibit "0.1.5"]]
   :repositories [["jts-snapshots" "https://dl.bintray.com/u-hopper/maven/"]
                  ["clojars" {:sign-releases false}]]
-  :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]]}})
+  :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]]
+                   :resource-paths ["devresources"]}})

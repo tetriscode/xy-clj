@@ -56,7 +56,7 @@
 
 (defn polygon
   ([coordinates]
-   (polygon (first coordinates) (second coordinates)))
+   (polygon (first coordinates) (rest coordinates)))
   ([outer-ring holes]
    (.createPolygon geometry-factory
                    (linear-ring outer-ring)
