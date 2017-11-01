@@ -40,7 +40,8 @@
   [coordinates]
   (.createLinearRing geometry-factory
                      (into-array Coordinate
-                                 (map #(apply coordinate %) coordinates))))
+                                 (map #(apply coordinate %)
+                                      coordinates))))
 
 (defn linestring
   [coordinates]

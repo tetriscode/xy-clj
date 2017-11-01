@@ -3,19 +3,19 @@
             [xy.shapes :as shapes]
             [xy.geojson :as gj]))
 
-(defn load-file [fname]
+(defn load-geojson [fname]
   (-> (slurp (str "devresources/" fname))
       (clojure.string/replace " " "")
       (clojure.string/replace "\n" "")))
 
-(def linestring-str (load-file "linestring.geojson"))
-(def point-str (load-file "point.geojson"))
-(def polygon-str (load-file "polygon.geojson"))
-(def multipoint-str (load-file "multipoint.geojson"))
-(def multilinestring-str (load-file "multilinestring.geojson"))
-(def multipolygon-str (load-file "multipolygon.geojson"))
-(def feature (load-file "feature.geojson"))
-(def featurecollection (load-file "featurecollection.geojson"))
+(def linestring-str (load-geojson "linestring.geojson"))
+(def point-str (load-geojson "point.geojson"))
+(def polygon-str (load-geojson "polygon.geojson"))
+(def multipoint-str (load-geojson "multipoint.geojson"))
+(def multilinestring-str (load-geojson "multilinestring.geojson"))
+(def multipolygon-str (load-geojson "multipolygon.geojson"))
+(def feature (load-geojson "feature.geojson"))
+(def featurecollection (load-geojson "featurecollection.geojson"))
 
 (deftest point-test
   (testing "Point string IO"
@@ -31,7 +31,7 @@
           poly-gj (gj/write poly)]
       (is (some? poly))
       (is (= "Polygon" (.getGeometryType poly)))
-      (is (= poly-gj polygon-str)))))
+      (is (= polygon-str poly-gj)))))
 
 (deftest linestring-test
   (testing "Linestring string IO"
@@ -40,5 +40,4 @@
       (is (some? ls))
       (is (= "LineString" (.getGeometryType ls)))
       (is (= linestring-gj linestring-str)))))
-
 

@@ -37,21 +37,21 @@
                  [[lon lat cnt]]
                  (line-gen lon lat cnt))
                (gen/tuple (spec/gen :gj/x) (spec/gen :gj/y) (spec/gen pos-int?)))))
-(spec/def :gjlspec/type (spec/with-gen string? #(spec/gen #{:LineString})))
+(spec/def :gjlspec/type (spec/with-gen string? #(spec/gen #{"LineString"})))
 (spec/def :gjpl/coordinates (spec/with-gen
                               coll?
                               #(gen/fmap (fn [[lon lat]] (list (circle-gen lon lat)))
                                          (gen/tuple (spec/gen :gj/x) (spec/gen :gj/y)))))
-(spec/def :gjpl/type (spec/with-gen string? #(spec/gen #{:Polygon})))
+(spec/def :gjpl/type (spec/with-gen string? #(spec/gen #{"Polygon"})))
 (spec/def :gjmpt/coordinates (spec/coll-of :gj/coordinates))
 (spec/def :gjmpt/type (spec/with-gen string? #(spec/gen #{"MultiPoint"})))
 (spec/def :gjmlspec/coordinates (spec/coll-of :gjlspec/coordinates))
-(spec/def :gjmlspec/type (spec/with-gen string? #(spec/gen #{:MultiLineString})))
+(spec/def :gjmlspec/type (spec/with-gen string? #(spec/gen #{"MultiLineString"})))
 (spec/def :gjmpl/coordinates (spec/coll-of :gjpl/coordinates))
-(spec/def :gjmpl/type (spec/with-gen string? #(spec/gen #{:MultiPolygon})))
+(spec/def :gjmpl/type (spec/with-gen string? #(spec/gen #{"MultiPolygon"})))
 
-(def geom-types #{"Point" :Polygon :LineString
-                  :MultiPolygon :MultiLineString "MultiPoint"})
+(def geom-types #{"Point" "Polygon"  "LineString"
+                  "MultiPolygon" "MultiLineString" "MultiPoint"})
 (spec/def :gj/point (spec/keys :req-un [:gjpt/type :gj/coordinates]))
 (spec/def :gj/linestring (spec/keys :req-un [:gjlspec/type :gjlspec/coordinates]))
 (spec/def :gj/polygon (spec/keys :req-un [:gjpl/type :gjpl/coordinates]))
@@ -102,7 +102,6 @@
 (spec/def ::featurecollection-spec (spec/keys :req-un [:fcgj/type :gj/features]))
 (spec/def ::featurecollectionpolygon-spec (spec/keys :req-un
                                                      [:fcgj/type :gjpoly/features]))
-
 
 (defn list->coords [coords]
   (map (fn [[x y]] (shapes/coordinate x y)) coords))
@@ -187,24 +186,26 @@
   (shapes/polygon (first (:coordinates val)) (rest (:coordinates val))))
 
 (defmethod write :Polygon
-  [val]
-  (json/write-str {:type :Polygon
-                   :coordinates [(let [shell (.getExteriorRing val)]
-                                   (map (fn [idx]
-                                          (let [pt (.getPointN shell idx)]
-                                            [(.getX pt) (.getY pt)]))
-                                        (range (.getNumPoints shell))))
-                                 (map (fn [hole-idx]
+    [val]
+    (json/write-str {:type        :Polygon
+                     :coordinates (concat
+                                    [(let [shell (.getExteriorRing val)]
+                                       (map (fn [idx]
+                                              (let [pt (.getPointN shell idx)]
+                                                [(.getX pt) (.getY pt)]))
+                                            (range (.getNumPoints shell))))]
+                                    (map
+                                      (fn [hole-idx]
                                         (let [hole (.getInteriorRingN val hole-idx)]
                                           (map (fn [idx]
-                                                 (let [pt (.getPointN hole idx)]
-                                                   [(.getX pt) (.getY pt)]))
+                                                   (let [pt (.getPointN hole idx)]
+                                                      [(.getX pt) (.getY pt)]))
                                                (range (.getNumPoints hole)))))
-                                      (range (.getNumInteriorRing val)))]}))
+                                      (range (.getNumInteriorRing val))))}))
 
 (defmethod parse :MultiPolygon
-  [val]
-  (shapes/multi-polygon (:coordinates val)))
+    [val]
+    (shapes/multi-polygon (:coordinates val)))
 
 (defmethod parse :default [_] {:id 0})
 
