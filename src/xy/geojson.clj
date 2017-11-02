@@ -50,7 +50,7 @@
 (spec/def :gjmpl/coordinates (spec/coll-of :gjpl/coordinates))
 (spec/def :gjmpl/type (spec/with-gen string? #(spec/gen #{"MultiPolygon"})))
 
-(def geom-types #{"Point" "Polygon"  "LineString"
+(def geom-types #{"Point" "Polygon" "LineString"
                   "MultiPolygon" "MultiLineString" "MultiPoint"})
 (spec/def :gj/point (spec/keys :req-un [:gjpt/type :gj/coordinates]))
 (spec/def :gj/linestring (spec/keys :req-un [:gjlspec/type :gjlspec/coordinates]))
@@ -108,109 +108,133 @@
 
 (defmulti parse "Takes a geojson parsed string->map" #(-> (:type %) keyword))
 
-(defmulti write "Takes a j and produces a geojson string" #(-> (.getGeometryType %) keyword))
+(defmulti write "Takes a jts and produces a geojson string"
+          (fn [geojson-map]
+            (case (:type geojson-map)
+              :FeatureCollection :FeatureCollection
+              :Feature :Feature
+              :GeometryCollection :GeometryCollection
+              (keyword (.getGeometryType geojson-map)))))
 
 (defmethod parse :FeatureCollection
-  [val]
-  (assoc val :type :FeatureCollection :features (map parse (:features val))))
+  [geojson-map]
+  (assoc geojson-map :type :FeatureCollection
+                     :features (map parse (:features geojson-map))))
 
 (defmethod write :FeatureCollection
-  [val]
-  (json/write-str (assoc val :features (map write (:features val)))))
+  [jts-geom]
+  (assoc jts-geom :features (map write (:features jts-geom))))
 
 (defmethod parse :Feature
-  [val]
-  (assoc val :type :Feature :geometry (parse (:geometry val))))
+  [geojson-map]
+  (assoc geojson-map :type :Feature :geometry (parse (:geometry geojson-map))))
 
 (defmethod write :Feature
-  [val]
-  (json/write-str (assoc val :feature (write (:feature val)))))
+  [jts-geom]
+  (assoc jts-geom :geometry (write (:geometry jts-geom))))
 
 (defmethod parse :GeometryCollection
-  [val]
-  (map parse (:geometries val)))
+  [geojson-map]
+  {:type :GeometryCollection
+   :geometries (map parse (:geometries geojson-map))})
 
 (defmethod write :GeometryCollection
-  [val]
-  (json/write-str (assoc val :geometries (map write (:geometries val)))))
+  [jts-geom]
+  (assoc jts-geom :geometries (map write (:geometries jts-geom))))
 
 (defmethod parse :Point
-  [val]
-  (shapes/point (:coordinates val)))
+  [geojson-map]
+  (shapes/point (:coordinates geojson-map)))
 
 (defmethod write :Point
-  [val]
-  (json/write-str {:type :Point :coordinates [(.getX val) (.getY val)]}))
+  [jts-geom]
+  {:type :Point :coordinates [(.getX jts-geom) (.getY jts-geom)]})
 
 (defmethod parse :MultiPoint
-  [val]
-  (shapes/multi-point (:coordinates val)))
+  [geojson-map]
+  (shapes/multi-point (:coordinates geojson-map)))
 
 (defmethod write :MultiPoint
-  [val]
-  (json/write-str {:type :MultiPoint
-                   :coordinates (map (fn [idx]
-                                       (let [geom (.getGeometryN val idx)]
-                                         [(.getX geom) (.getY geom)]))
-                                     (range (.getNumGeometries val)))}))
+  [jts-geom]
+  {:type        :MultiPoint
+   :coordinates (map (fn [idx]
+                       (let [geom (.getGeometryN jts-geom idx)]
+                         [(.getX geom) (.getY geom)]))
+                     (range (.getNumGeometries jts-geom)))})
 
 (defmethod parse :LineString
-  [val]
-  (shapes/linestring (:coordinates val)))
+  [geojson-map]
+  (shapes/linestring (:coordinates geojson-map)))
 
 (defmethod write :LineString
-  [val]
-  (json/write-str {:type :LineString
-                   :coordinates (map (fn [idx]
-                                       (let [pt (.getPointN val idx)]
-                                         [(.getX pt) (.getY pt)]))
-                                     (range (.getNumPoints val)))}))
+  [jts-geom]
+  {:type        :LineString
+   :coordinates (map (fn [idx]
+                       (let [pt (.getPointN jts-geom idx)]
+                         [(.getX pt) (.getY pt)]))
+                     (range (.getNumPoints jts-geom)))})
 
 (defmethod parse :MultiLineString
-  [val]
-  (shapes/multi-linestring (:coordinates val)))
+  [geojson-map]
+  (shapes/multi-linestring (:coordinates geojson-map)))
 
 (defmethod write :MultiLineString
-  [val]
-  (json/write-str {:type :MultiLineString
-                   :coordinates (map (fn [idx]
-                                       (let [geom (.getGeometryN val idx)]
-                                         (map (fn [lidx]
-                                                (let [pt (.getPointN geom lidx)]
-                                                  [(.getX pt) (.getY pt)]))
-                                              (range (.getNumPoints geom)))))
-                                     (range (.getNumGeometries val)))}))
+  [jts-geom]
+  {:type        :MultiLineString
+   :coordinates (map (fn [idx]
+                       (let [geom (.getGeometryN jts-geom idx)]
+                         (map (fn [lidx]
+                                (let [pt (.getPointN geom lidx)]
+                                  [(.getX pt) (.getY pt)]))
+                              (range (.getNumPoints geom)))))
+                     (range (.getNumGeometries jts-geom)))})
 
 (defmethod parse :Polygon
-  [val]
-  (shapes/polygon (first (:coordinates val)) (rest (:coordinates val))))
+  [geojson-map]
+  (shapes/polygon (first (:coordinates geojson-map)) (rest (:coordinates geojson-map))))
+
+(defn jts-polygon->coords [jts-geom]
+  (concat
+    [(let [shell (.getExteriorRing jts-geom)]
+       (map (fn [idx]
+              (let [pt (.getPointN shell idx)]
+                [(.getX pt) (.getY pt)]))
+            (range (.getNumPoints shell))))]
+    (map
+      (fn [hole-idx]
+        (let [hole (.getInteriorRingN jts-geom hole-idx)]
+          (map (fn [idx]
+                 (let [pt (.getPointN hole idx)]
+                   [(.getX pt) (.getY pt)]))
+               (range (.getNumPoints hole)))))
+      (range (.getNumInteriorRing jts-geom)))))
 
 (defmethod write :Polygon
-    [val]
-    (json/write-str {:type        :Polygon
-                     :coordinates (concat
-                                    [(let [shell (.getExteriorRing val)]
-                                       (map (fn [idx]
-                                              (let [pt (.getPointN shell idx)]
-                                                [(.getX pt) (.getY pt)]))
-                                            (range (.getNumPoints shell))))]
-                                    (map
-                                      (fn [hole-idx]
-                                        (let [hole (.getInteriorRingN val hole-idx)]
-                                          (map (fn [idx]
-                                                   (let [pt (.getPointN hole idx)]
-                                                      [(.getX pt) (.getY pt)]))
-                                               (range (.getNumPoints hole)))))
-                                      (range (.getNumInteriorRing val))))}))
+  [jts-geom]
+  {:type        :Polygon
+   :coordinates (jts-polygon->coords jts-geom)})
 
 (defmethod parse :MultiPolygon
-    [val]
-    (shapes/multi-polygon (:coordinates val)))
+  [geojson-map]
+  (shapes/multi-polygon (:coordinates geojson-map)))
+
+(defmethod write :MultiPolygon
+  [jts-geom]
+  {:type        :MultiPolygon
+   :coordinates (map
+                  #(jts-polygon->coords (.getGeometryN jts-geom %))
+                  (range (.getNumGeometries jts-geom)))})
 
 (defmethod parse :default [_] {:id 0})
 
-(defn parse-str
-  "Parses a string containing geojson"
-  [val-str]
-  (parse (walk/keywordize-keys (clojure.data.json/read-str val-str))))
+(defn str->map
+  "Parses a string containing geojson and returns a geojson map
+  with the :geometry a jts geometry"
+  [geojson-str]
+  (parse (walk/keywordize-keys (clojure.data.json/read-str geojson-str))))
 
+(defn map->str
+  "Takes a GeoJSON Map with a JTS Geom in the :geometry key
+  and returns a geojson string"
+  [jts-geom]
+  (json/write-str (write jts-geom)))
