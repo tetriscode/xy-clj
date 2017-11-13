@@ -4,7 +4,7 @@
             [xy.geojson :as gj]))
 
 (defn load-geojson [fname]
-  (-> (slurp (str "devresources/" fname))
+  (-> (slurp (str "dev-resources/" fname))
       (clojure.string/replace " " "")
       (clojure.string/replace "\n" "")))
 
@@ -16,6 +16,7 @@
 (def multipolygon-str (load-geojson "multipolygon.geojson"))
 (def feature-str (load-geojson "feature.geojson"))
 (def featurecollection-str (load-geojson "featurecollection.geojson"))
+(def geometrycollection-str (load-geojson "geometrycollection.geojson"))
 
 (deftest point-test
   (testing "Point string IO"
