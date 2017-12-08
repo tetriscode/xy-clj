@@ -1,7 +1,7 @@
 (ns xy.shapes-test
   (:require [clojure.test :refer :all]
             [xy.shapes :as shapes]
-            [xy.relations :as relations]))
+            [xy.relation :as relations]))
 
 (deftest point-test
   (testing "POINT"
