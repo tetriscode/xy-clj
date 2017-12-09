@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Built-By: wesr
-Created-By: Leiningen 2.5.3
-Build-Jdk: 1.8.0_71
-Main-Class: clojure.main
-
