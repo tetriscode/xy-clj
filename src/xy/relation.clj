@@ -1,6 +1,9 @@
 (ns xy.relation)
 
-(defn loop-a [func sel-key a b]
+(defn loop-a
+  "This function loops over the variable a if it is a collection
+  Geometry such as FeatureCollection, Geometry Collection"
+  [func sel-key a b]
   (loop [coll (sel-key a)]
     (if coll
       (if (func (first coll) b)
@@ -8,28 +11,36 @@
         false)
       true)))
 
+(defn loop-b
+  [func a b]
+  (case (:type b)
+    "GeometryCollection" (loop [b-geoms (:geometries b)]
+                           (if b-geoms
+                             (if (loop-b func a (first b-geoms))
+                               (recur (rest b-geoms))
+                               false)
+                             true))
+    "FeatureCollection" (loop [b-feats (:features b)]
+                          (if b-feats
+                            (if (loop-b func a (first b-feats))
+                              (recur (rest b-feats))
+                              false)
+                            true))
+    "Feature" (loop-b func a (:geometry b))
+    (func a b))) ; default case means a and b are both geometries
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;WITHIN;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; This function must be created because .within cannot be passed as a first
+;; class function in Clojure
+(defn- within-func [a b] (.within a b))
+
 (defn- within
   "Tests if A is within B"
   [a b]
-  (case (:type b)
-    "GeometryCollection" (loop [gs (:geometries b)]
-                           (if gs
-                             (if (within a (first gs))
-                               (recur (rest gs))
-                               false)
-                             true))
-    "FeatureCollection" (loop [gs (:features b)]
-                          (if gs
-                            (if (within a (first gs))
-                              (recur (rest gs))
-                              false)
-                            true))
-    "Feature" (.within a (:geometry b))
-    (.within a b)))
+  (loop-b within-func a b))
 
 (defmulti within? "within? for GeoJSON Maps" :type)
 
@@ -78,10 +89,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;DISJOINT;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn- disjoint-func [a b] (.disjoint a b))
+
 (defn- disjoint
   "Tests if A is not within B"
   [a b]
-  (.disjoint a b))
+  (loop-b disjoint-func a b))
 
 (defmulti disjoint? "disjoint for GeoJSON Maps" :type)
 

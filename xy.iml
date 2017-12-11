@@ -19,7 +19,6 @@
     <orderEntry type="library" name="Leiningen: org.clojure/data.json:0.2.6" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/spec.alpha:0.1.143" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/test.check:0.9.0" level="project" />
-    <orderEntry type="library" name="Leiningen: org.clojure/tools.namespace:0.2.3" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.nrepl:0.2.12" level="project" />
     <orderEntry type="library" name="Leiningen: org.locationtech.jts/jts-core:1.15.0-uhopper" level="project" />
     <orderEntry type="library" name="Leiningen: pjstadig/humane-test-output:0.8.2" level="project" />
