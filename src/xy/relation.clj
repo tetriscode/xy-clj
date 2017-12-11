@@ -70,15 +70,15 @@
 
 (defmulti intersects? "intersects for GeoJSON Maps" :type)
 
-(defmethod intersects? :GeometryCollection
+(defmethod intersects? "GeometryCollection"
   [a b]
   (loop-a intersects? :geometries a b))
 
-(defmethod intersects? :FeatureCollection
+(defmethod intersects? "FeatureCollection"
   [a b]
   (loop-a intersects? :features a b))
 
-(defmethod intersects? :Feature
+(defmethod intersects? "Feature"
   [a b]
   (intersects? (:geometry a) b))
 
@@ -98,15 +98,15 @@
 
 (defmulti disjoint? "disjoint for GeoJSON Maps" :type)
 
-(defmethod disjoint? :GeometryCollection
+(defmethod disjoint? "GeometryCollection"
   [a b]
   (loop-a disjoint? :geometries a b))
 
-(defmethod disjoint? :FeatureCollection
+(defmethod disjoint? "FeatureCollection"
   [a b]
   (loop-a disjoint? :features a b))
 
-(defmethod disjoint? :Feature
+(defmethod disjoint? "Feature"
   [a b]
   (disjoint? (:geometry a) b))
 
@@ -124,15 +124,15 @@
 
 (defmulti touches? "touches for GeoJSON Maps" :type)
 
-(defmethod touches? :GeometryCollection
+(defmethod touches? "GeometryCollection"
   [a b]
   (loop-a touches? :geometries a b))
 
-(defmethod touches? :FeatureCollection
+(defmethod touches? "FeatureCollection"
   [a b]
   (loop-a touches? :features a b))
 
-(defmethod touches? :Feature
+(defmethod touches? "Feature"
   [a b]
   (touches? (:geometry a) b))
 
@@ -151,15 +151,15 @@
 
 (defmulti crosses? "crosses for GeoJSON Maps" :type)
 
-(defmethod crosses? :GeometryCollection
+(defmethod crosses? "GeometryCollection"
   [a b]
   (loop-a crosses? :geometries a b))
 
-(defmethod crosses? :FeatureCollection
+(defmethod crosses? "FeatureCollection"
   [a b]
   (loop-a crosses? :features a b))
 
-(defmethod crosses? :Feature
+(defmethod crosses? "Feature"
   [a b]
   (crosses? (:geometry a) b))
 
@@ -177,15 +177,15 @@
 
 (defmulti contained? "contained for GeoJSON Maps" :type)
 
-(defmethod contained? :GeometryCollection
+(defmethod contained? "GeometryCollection"
   [a b]
   (loop-a contained? :geometries a b))
 
-(defmethod contained? :FeatureCollection
+(defmethod contained? "FeatureCollection"
   [a b]
   (loop-a contained? :features a b))
 
-(defmethod contained? :Feature
+(defmethod contained? "Feature"
   [a b]
   (contained? (:geometry a) b))
 
@@ -203,15 +203,15 @@
 
 (defmulti overlaps? "overlaps for GeoJSON Maps" :type)
 
-(defmethod overlaps? :GeometryCollection
+(defmethod overlaps? "GeometryCollection"
   [a b]
   (loop-a overlaps? :geometries a b))
 
-(defmethod overlaps? :FeatureCollection
+(defmethod overlaps? "FeatureCollection"
   [a b]
   (loop-a overlaps? :features a b))
 
-(defmethod overlaps? :Feature
+(defmethod overlaps? "Feature"
   [a b]
   (overlaps? (:geometry a) b))
 
@@ -229,15 +229,15 @@
 
 (defmulti covers? "covers for GeoJSON Maps" :type)
 
-(defmethod covers? :GeometryCollection
+(defmethod covers? "GeometryCollection"
   [a b]
   (loop-a covers? :geometries a b))
 
-(defmethod covers? :FeatureCollection
+(defmethod covers? "FeatureCollection"
   [a b]
   (loop-a covers? :features a b))
 
-(defmethod covers? :Feature
+(defmethod covers? "Feature"
   [a b]
   (covers? (:geometry a) b))
 
