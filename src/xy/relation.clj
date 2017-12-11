@@ -18,13 +18,13 @@
   (case (:type b)
     "GeometryCollection" (loop [gs (:geometries b)]
                            (if gs
-                             (if (.within a (first gs))
+                             (if (within a (first gs))
                                (recur (rest gs))
                                false)
                              true))
     "FeatureCollection" (loop [gs (:features b)]
                           (if gs
-                            (if (.within a (first gs))
+                            (if (within a (first gs))
                               (recur (rest gs))
                               false)
                             true))
