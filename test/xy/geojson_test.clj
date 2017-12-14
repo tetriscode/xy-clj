@@ -1,12 +1,7 @@
 (ns xy.geojson-test
   (:require [clojure.test :refer :all]
-            [xy.shapes :as shapes]
+            [xy.test-utils :refer [load-geojson]]
             [xy.geojson :as gj]))
-
-(defn load-geojson [fname]
-  (-> (slurp (str "dev-resources/" fname))
-      (clojure.string/replace " " "")
-      (clojure.string/replace "\n" "")))
 
 (def linestring-str (load-geojson "linestring.geojson"))
 (def point-str (load-geojson "point.geojson"))
