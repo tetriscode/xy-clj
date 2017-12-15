@@ -1,4 +1,4 @@
-(defproject tetriscode/xy "0.8.4"
+(defproject tetriscode/xy "0.8.5"
   :description "XY: A Clojure library for Geo"
   :url "http://github.com/tetriscode/xy"
   :license {:name "Eclipse Public License"

@@ -5,8 +5,8 @@
   Geometry such as FeatureCollection, Geometry Collection"
   [func sel-key a b]
   (loop [coll (sel-key a)]
-    (if-let [new-a (first coll)]
-      (if (func new-a b)
+    (if-let [first-a (first coll)]
+      (if (func first-a b)
         (recur (rest coll))
         false)
       true)))
@@ -21,8 +21,8 @@
                                false)
                              true))
     "FeatureCollection" (loop [b-feats (:features b)]
-                          (if b-feats
-                            (if (loop-b func a (first b-feats))
+                          (if-let [first-b (first b-feats)]
+                            (if (loop-b func a first-b)
                               (recur (rest b-feats))
                               false)
                             true))

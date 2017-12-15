@@ -30,4 +30,8 @@
     (is (relation/within? ord illinois))
     (is (relation/within? {:type "FeatureCollection"
                            :features [mdw ord]}
-                          illinois))))
+                          illinois))
+    (is (relation/within? {:type "FeatureCollection"
+                           :features [mdw ord]}
+                          {:type "FeatureCollection"
+                           :features [illinois]}))))
