@@ -23,7 +23,7 @@
 (def ord (get-airport "ORD"))
 
 (deftest within
-  (testing "Feature Collection in Polygon Test"
+  (testing "GeoJSON Within Test"
     (is (relation/within? stl missouri))
     (is (relation/within? dfw texas))
     (is (relation/within? mdw illinois))
@@ -35,3 +35,17 @@
                            :features [mdw ord]}
                           {:type "FeatureCollection"
                            :features [illinois]}))))
+
+(deftest disjoint
+  (testing "GeoJSON Disjoint Test"
+    (is (relation/disjoint? dfw missouri))
+    (is (not (relation/disjoint? stl missouri)))
+    (is (not (relation/disjoint? {:type "FeatureCollection"
+                                :features [mdw ord]}
+                               illinois)))
+    (is (relation/disjoint? {:type "FeatureCollection"
+                             :features [dfw stl]}
+                            {:type "FeatureCollection"
+                             :features [illinois]}))))
+
+
