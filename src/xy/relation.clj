@@ -117,10 +117,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;TOUCHES;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn- touches-func [a b] (.touches a b))
+
 (defn touches
   "Tests if A touches B"
   [a b]
-  (.touches a b))
+  (loop-b touches-func a b))
 
 (defmulti touches? "touches for GeoJSON Maps" :type)
 
@@ -140,14 +142,15 @@
   [a b]
   (touches a b))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;CROSSES;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn crosses-func [a b] (.crosses a b))
+
 (defn crosses
   "Tests if A crosses B"
   [a b]
-  (.crosses a b))
+  (loop-b crosses-func a b))
 
 (defmulti crosses? "crosses for GeoJSON Maps" :type)
 
@@ -168,12 +171,14 @@
   (crosses a b))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;CONTAINED;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;CONTAINED;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn contained-func [a b] (.contains a b))
+
 (defn contained
   "Tests if A contains B"
   [a b]
-  (.contains a b))
+  (loop-b contained-func a b))
 
 (defmulti contained? "contained for GeoJSON Maps" :type)
 
@@ -196,10 +201,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;OVERLAPS;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn overlaps-func [a b] (.overlaps a b))
+
 (defn overlaps
   "Tests if A overlaps B"
   [a b]
-  (.overlaps a b))
+  (loop-b overlaps-func a b))
 
 (defmulti overlaps? "overlaps for GeoJSON Maps" :type)
 
@@ -222,10 +229,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;COVERS;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn covers-func [a b] (.covers a b))
+
 (defn covers
   "Tests if A covers B"
   [a b]
-  (.covers a b))
+  (loop-b covers-func a b))
 
 (defmulti covers? "covers for GeoJSON Maps" :type)
 

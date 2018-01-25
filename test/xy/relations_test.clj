@@ -48,4 +48,28 @@
                             {:type "FeatureCollection"
                              :features [illinois]}))))
 
+(deftest contained
+  (testing "GeoJSON Contained Test"
+    (is (relation/contained? missouri stl))
+    (is (relation/contained? texas dfw))
+    (is (relation/contained? illinois mdw))
+    (is (relation/contained? illinois ord))
+    (is (not (relation/contained? illinois missouri)))))
+
+(deftest touches
+  (testing "GeoJSON Touches test"
+    (is (relation/touches? missouri illinois))
+    (is (not (relation/touches? missouri texas)))))
+
+(deftest crosses
+  (testing "GeoJSON Crosses test"
+    (is (not (relation/crosses? missouri texas)))))
+
+(deftest overlaps
+  (testing "GeoJSON Overlaps test"
+    (is (not (relation/overlaps? missouri texas)))))
+
+(deftest covers
+  (testing "GeoJSON Covers test"
+    (is (not (relation/covers? missouri texas)))))
 
