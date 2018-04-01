@@ -109,17 +109,17 @@
 (defmulti parse "Takes a geojson parsed string->map" :type)
 
 (defmulti write "Takes a jts and produces a geojson string"
-          (fn [geojson-map]
-            (case (:type geojson-map)
-              "FeatureCollection" "FeatureCollection"
-              "Feature" "Feature"
-              "GeometryCollection" "GeometryCollection"
-              (.getGeometryType geojson-map))))
+  (fn [geojson-map]
+    (case (:type geojson-map)
+      "FeatureCollection" "FeatureCollection"
+      "Feature" "Feature"
+      "GeometryCollection" "GeometryCollection"
+      (.getGeometryType geojson-map))))
 
 (defmethod parse "FeatureCollection"
   [geojson-map]
   (assoc geojson-map :type "FeatureCollection"
-                     :features (map parse (:features geojson-map))))
+         :features (map parse (:features geojson-map))))
 
 (defmethod write "FeatureCollection"
   [jts-geom]
@@ -195,19 +195,19 @@
 
 (defn jts-polygon->coords [jts-geom]
   (concat
-    [(let [shell (.getExteriorRing jts-geom)]
-       (map (fn [idx]
-              (let [pt (.getPointN shell idx)]
-                [(.getX pt) (.getY pt)]))
-            (range (.getNumPoints shell))))]
-    (map
-      (fn [hole-idx]
-        (let [hole (.getInteriorRingN jts-geom hole-idx)]
-          (map (fn [idx]
-                 (let [pt (.getPointN hole idx)]
-                   [(.getX pt) (.getY pt)]))
-               (range (.getNumPoints hole)))))
-      (range (.getNumInteriorRing jts-geom)))))
+   [(let [shell (.getExteriorRing jts-geom)]
+      (map (fn [idx]
+             (let [pt (.getPointN shell idx)]
+               [(.getX pt) (.getY pt)]))
+           (range (.getNumPoints shell))))]
+   (map
+    (fn [hole-idx]
+      (let [hole (.getInteriorRingN jts-geom hole-idx)]
+        (map (fn [idx]
+               (let [pt (.getPointN hole idx)]
+                 [(.getX pt) (.getY pt)]))
+             (range (.getNumPoints hole)))))
+    (range (.getNumInteriorRing jts-geom)))))
 
 (defmethod write "Polygon"
   [jts-geom]
@@ -222,8 +222,8 @@
   [jts-geom]
   {:type        "MultiPolygon"
    :coordinates (map
-                  #(jts-polygon->coords (.getGeometryN jts-geom %))
-                  (range (.getNumGeometries jts-geom)))})
+                 #(jts-polygon->coords (.getGeometryN jts-geom %))
+                 (range (.getNumGeometries jts-geom)))})
 
 (defmethod parse :default [_] {:id 0})
 

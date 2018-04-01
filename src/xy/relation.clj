@@ -1,4 +1,5 @@
-(ns xy.relation)
+(ns xy.relation
+  (:import [org.locationtech.jts.operation.buffer BufferOp]))
 
 (defn loop-a
   "This function loops over the variable a if it is a collection
@@ -254,3 +255,10 @@
   [a b]
   (covers a b))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;BUFFER;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn buffer
+  "Computes a buffer for the geom"
+  [geom buffer-distance]
+  (BufferOp/bufferOp geom buffer-distance))
